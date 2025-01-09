@@ -1,7 +1,7 @@
-version: '3.8'
+version: '3'
 
 services:
-  app:
-    image: lucasycosta/nginx:${env.IMAGE_TAG}
+  nginx:
+    image: lucasycosta/nginx:${IMAGE_TAG}
     ports:
       - "80:80"
