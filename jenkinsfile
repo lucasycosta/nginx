@@ -12,10 +12,10 @@ pipeline {
                 script {
                     def response = bat(
                         script: """
-                            curl -s ${DOCKER_REGISTRY_API}/${IMAGE_NAME}/tags ^
-                            | jq -r ".results[].name" ^
-                            | sort /r ^
-                            | findstr /r "^.*"
+                            $response = Invoke-RestMethod -Uri '${DOCKER_REGISTRY_API}/${IMAGE_NAME}/tags' -Method GET
+                            $tags = $response.results.name
+                            $latestTag = $tags | Sort-Object -Descending | Select-Object -First 1
+                            Write-Output $latestTag
                         """,
                         returnStdout: true
                     ).trim()
@@ -33,9 +33,10 @@ pipeline {
         stage('Update Docker Compose') {
             steps {
                 script {
-                    bat """
-                        powershell -Command ^
-                        "(Get-Content docker-compose.yaml) -replace 'image: ${IMAGE_NAME}:.*', 'image: ${IMAGE_NAME}:${LATEST_TAG}' | Set-Content docker-compose.yaml"
+                    powershell """
+                        (Get-Content docker-compose.yaml) `
+                        -replace 'image: ${IMAGE_NAME}:.*', 'image: ${IMAGE_NAME}:${LATEST_TAG}' `
+                        | Set-Content docker-compose.yaml
                     """
                 }
             }
