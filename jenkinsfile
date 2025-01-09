@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "lucasycosta/nginx"
+        DOCKER_REGISTRY_API = "https://registry.hub.docker.com/v2/repositories"
+    }
+
+    stages {
+        stage('Get Latest Image Tag') {
+            steps {
+                script {
+                    def response = bat(
+                        script: """
+                            curl -s ${DOCKER_REGISTRY_API}/${IMAGE_NAME}/tags ^
+                            | jq -r ".results[].name" ^
+                            | sort /r ^
+                            | findstr /r "^.*"
+                        """,
+                        returnStdout: true
+                    ).trim()
+
+                    if (!response) {
+                        error("Failed to fetch the latest tag for ${IMAGE_NAME}")
+                    }
+                    
+                    env.LATEST_TAG = response
+                    echo "Latest tag found: ${env.LATEST_TAG}"
+                }
+            }
+        }
+
+        stage('Update Docker Compose') {
+            steps {
+                script {
+                    bat """
+                        powershell -Command ^
+                        "(Get-Content docker-compose.yaml) -replace 'image: ${IMAGE_NAME}:.*', 'image: ${IMAGE_NAME}:${LATEST_TAG}' | Set-Content docker-compose.yaml"
+                    """
+                }
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                bat """
+                    docker-compose pull
+                    docker-compose up -d
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment succeeded!'
+        }
+        failure {
+            echo 'Deployment failed.'
+        }
+    }
+}
