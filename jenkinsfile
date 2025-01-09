@@ -10,6 +10,25 @@ pipeline{
     }
 
 	stages{
+        stage('Deletar versao antiga'){
+			steps{
+				script{
+					def dockerImageId = sh(
+                        script: 'docker images --format "{{.ID}}" --filter "reference=lucasycosta/nginx"',
+                        returnStdout: true
+                    ).trim()
+                    echo "Docker Image ID: ${dockerImageId}"
+
+					sh """
+						if [ -z "${dockerImageId}" ]; then
+							echo "não há imagem para ser deletada"
+						else
+							docker rmi ${dockerImageId}
+						fi
+					"""
+				}
+			}
+		}
 		stage('Build/Run Image Backend'){
 			steps{
 				script{
@@ -33,6 +52,7 @@ pipeline{
 			steps{
 				script{
 					//bat "docker run -dp 80:80 lucasycosta/nginx:$BUILD_ID"
+                    bat "docker-compose down"
                     bat "docker-compose up -d"
 					//writeFile file: '/home/ec2-user/nova_imagem.txt', text: "zeussh/mapper-calculadora:$BUILD_ID"
 				}

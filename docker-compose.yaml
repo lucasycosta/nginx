@@ -2,6 +2,7 @@ version: '3'
 
 services:
   nginx:
+    container_name: nginx
     image: lucasycosta/nginx:${IMAGE_TAG}
     ports:
       - "80:80"
