@@ -11,9 +11,9 @@ pipeline{
 			steps{
 				script{
 					def buildId = env.BUILD_ID
-					bat 'echo $BUILD_ID'
+					bat "echo %BUILD_ID%"
 
-					bat 'docker build -t lucasycosta/nginx:$BUILD_ID .'
+					bat 'docker build -t lucasycosta/nginx:${buildId} .'
 				}
 			}
 		}
@@ -21,7 +21,7 @@ pipeline{
 		stage('Deploy image'){
 			steps{
 				script{
-					bat 'docker run -dp 80:80 lucasycosta/nginx:$BUILD_ID'
+					bat 'docker run -dp 80:80 lucasycosta/nginx:${buildId}'
 
 					//writeFile file: '/home/ec2-user/nova_imagem.txt', text: "zeussh/mapper-calculadora:$BUILD_ID"
 				}
