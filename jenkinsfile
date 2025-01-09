@@ -10,25 +10,6 @@ pipeline{
     }
 
 	stages{
-        stage('Deletar versao antiga'){
-			steps{
-				script{
-					def dockerImageId = sh(
-                        script: 'docker images --format "{{.ID}}" --filter "reference=lucasycosta/nginx"',
-                        returnStdout: true
-                    ).trim()
-                    echo "Docker Image ID: ${dockerImageId}"
-
-					sh """
-						if [ -z "${dockerImageId}" ]; then
-							echo "não há imagem para ser deletada"
-						else
-							docker rmi ${dockerImageId}
-						fi
-					"""
-				}
-			}
-		}
 		stage('Build/Run Image Backend'){
 			steps{
 				script{
