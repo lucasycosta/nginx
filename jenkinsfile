@@ -1,63 +1,32 @@
-pipeline {
-    agent any
-
-    environment {
-        IMAGE_NAME = "lucasycosta/nginx"
-        DOCKER_REGISTRY_API = "https://registry.hub.docker.com/v2/repositories"
+pipeline{
+	agent any
+	//TESTE WEBHOOK 2
+	triggers {
+        githubPush()  
     }
 
-    stages {
-        stage('Get Latest Image Tag') {
-            steps {
-                script {
-                    def response = bat(
-                        script: """
-                            $response = Invoke-RestMethod -Uri '${DOCKER_REGISTRY_API}/${IMAGE_NAME}/tags' -Method GET
-                            $tags = $response.results.name
-                            $latestTag = $tags | Sort-Object -Descending | Select-Object -First 1
-                            Write-Output $latestTag
-                        """,
-                        returnStdout: true
-                    ).trim()
+	stages{
+	
+		stage('Build/Run Image Backend'){
+			steps{
+				script{
+					def buildId = env.BUILD_ID
+					sh 'echo $BUILD_ID'
 
-                    if (!response) {
-                        error("Failed to fetch the latest tag for ${IMAGE_NAME}")
-                    }
-                    
-                    env.LATEST_TAG = response
-                    echo "Latest tag found: ${env.LATEST_TAG}"
-                }
-            }
-        }
+					sh 'docker build -t lucasycosta/nginx:$BUILD_ID .'
+				}
+			}
+		}
+		
+		stage('Deploy image'){
+			steps{
+				script{
+					sh 'docker run -dp 80:80 lucasycosta/nginx:$BUILD_ID'
 
-        stage('Update Docker Compose') {
-            steps {
-                script {
-                    powershell """
-                        (Get-Content docker-compose.yaml) `
-                        -replace 'image: ${IMAGE_NAME}:.*', 'image: ${IMAGE_NAME}:${LATEST_TAG}' `
-                        | Set-Content docker-compose.yaml
-                    """
-                }
-            }
-        }
+					//writeFile file: '/home/ec2-user/nova_imagem.txt', text: "zeussh/mapper-calculadora:$BUILD_ID"
+				}
+			}
+		}
 
-        stage('Deploy Application') {
-            steps {
-                bat """
-                    docker-compose pull
-                    docker-compose up -d
-                """
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Deployment succeeded!'
-        }
-        failure {
-            echo 'Deployment failed.'
-        }
-    }
+	}
 }
