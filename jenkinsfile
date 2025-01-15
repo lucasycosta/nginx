@@ -40,5 +40,14 @@ pipeline{
 			}
 		}
 
+        stage("Kubernetes"){
+            steps{
+                script{
+                    bat "set IMAGE_TAG=$BUILD_ID"
+                    bat "kubectl apply -f"
+                }
+            }
+        }
+
 	}
 }
