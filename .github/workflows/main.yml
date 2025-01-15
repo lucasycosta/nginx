@@ -9,9 +9,16 @@ jobs:                                         # tarefas
     runs-on: ubuntu-latest                    # runner do job
     steps:                                    # passos de execução
       - name: "Minha primeira ação"
+        
         run: echo "Hello Worls"               # comando que será executado
       - name: "Segunda ação"
         run: |
           echo "Criação da primeira pipeline e workflow"
           echo "Uhuuuuuuuuuuuuu"
+      - name: "Teste SHELL"
+        run: |
+          variavel = "Testeeeeeeeeeeeeeeeeeeeeee"
+          print(variavel)
+        shell: python                         # tipo do terminal, permite executar diferentes comandos
+          
     
