@@ -1,0 +1,17 @@
+name: primeira-pipeline                       # nome do workflow
+on:                                           # triger que irá disparar a ação
+  push:                                       # o gatilho é um commit 
+    branches: ["master"]                      # branches em que o commit dispara o triger
+  workflow_dispatch:                          # permite execução manual
+jobs:                                         # tarefas
+  primeiro-job:                               # inicio da declaração do job
+    name: "Meu primeiro job"
+    runs-on: ubuntu-latest                    # runner do job
+    steps:                                    # passos de execução
+      - name: "Minha primeira ação"
+        run: echo "Hello Worls"               # comando que será executado
+      - name: "Segunda ação"
+        run: |
+          echo "Criação da primeira pipeline e workflow"
+          echo "Uhuuuuuuuuuuuuu"
+    
