@@ -27,7 +27,7 @@ jobs:                                         # tarefas
       - name: "Verificação da versão do NodJS atual"
         run: node --version
       - name: "Definição da versão 22.13.0 do NodeJS"
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4.1.0
         with:
           node-version: "22.13.0"
       - name: "Nova Verificação"
