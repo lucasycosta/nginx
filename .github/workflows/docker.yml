@@ -14,5 +14,12 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: build da imagem
+      uses: docker/build-push-action@v6
+      with:
+        context: ./src
+        file: ./src/Dockerfile
+        push: true
+        tags: lucasycosta/nginx:${{github.run_number}}
 
 
