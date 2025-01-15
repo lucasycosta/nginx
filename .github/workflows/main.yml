@@ -20,5 +20,11 @@ jobs:                                         # tarefas
           variavel = "Testeeeeeeeeeeeeeeeeeeeeee"
           print(variavel)
         shell: python                         # tipo do terminal, permite executar diferentes comandos
-          
+  segundo-job:                               
+    name: "Meu segundo job"
+    runs-on: ubuntu-latest                 
+    steps:    
+      - name: "Verificação da versão do NodJS atual"
+        run: node --version
+        
     
